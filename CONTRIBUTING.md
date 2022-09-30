@@ -13,7 +13,7 @@
 - Micro SD card adapter to flash DietPi
 - Ethernet cable to connect the Raspberry Pi to your ISP box
 - DuckDNS account ([DuckDNS Website](https://www.duckdns.org/))
-- Basic knowledge of Linux systems administration, networking concepts and public key cryptography (PKC)
+- Basic knowledge of Linux systems administration, networking concepts and cryptography
 
 ## Style guides
 
