@@ -12,13 +12,13 @@ AUTO_SETUP_AUTOMATED=1
 #-------------------------------
 
 # locale (e.g. "en_GB.UTF-8", "fr_FR.UTF-8")
-AUTO_SETUP_LOCALE=en_GB.UTF-8
+AUTO_SETUP_LOCALE=C.UTF-8
 
 # keyboard layout (e.g. "gb", "fr")
-AUTO_SETUP_KEYBOARD_LAYOUT=gb
+AUTO_SETUP_KEYBOARD_LAYOUT=fr
 
 # timezone (e.g. "Europe/Dublin", "Europe/Paris")
-AUTO_SETUP_TIMEZONE=Europe/Dublin
+AUTO_SETUP_TIMEZONE=Europe/Paris
 
 # network configuration
 AUTO_SETUP_NET_HOSTNAME=dietpi-vpn
@@ -28,7 +28,7 @@ AUTO_SETUP_NET_STATIC_GATEWAY=192.168.0.1
 AUTO_SETUP_NET_STATIC_DNS=9.9.9.9 149.112.112.112
 
 # global Password to be applied for the system
-AUTO_SETUP_GLOBAL_PASSWORD=toor
+AUTO_SETUP_GLOBAL_PASSWORD=MySecret
 
 #------------------------------------
 # variables less likely to be changed
@@ -37,11 +37,12 @@ AUTO_SETUP_GLOBAL_PASSWORD=toor
 AUTO_SETUP_NET_ETHERNET_ENABLED=1
 AUTO_SETUP_NET_WIFI_ENABLED=0
 AUTO_SETUP_NET_ETH_FORCE_SPEED=0
-AUTO_SETUP_NET_WIFI_COUNTRY_CODE=GB
+AUTO_SETUP_NET_WIFI_COUNTRY_CODE=FR
 AUTO_SETUP_NET_USESTATIC=1
 AUTO_SETUP_DHCP_TO_STATIC=0
 AUTO_SETUP_BOOT_WAIT_FOR_NETWORK=1
 AUTO_SETUP_SWAPFILE_SIZE=1
+AUTO_SETUP_SWAPFILE_LOCATION=/var/swap
 AUTO_SETUP_HEADLESS=1
 AUTO_UNMASK_LOGIND=0
 AUTO_SETUP_CUSTOM_SCRIPT_EXEC=0
@@ -62,6 +63,10 @@ CONFIG_CPU_USAGE_THROTTLE_UP=50
 CONFIG_CPU_MAX_FREQ=Disabled
 CONFIG_CPU_MIN_FREQ=Disabled
 CONFIG_CPU_DISABLE_TURBO=0
+CONFIG_PROXY_ADDRESS=MyProxyServer.com
+CONFIG_PROXY_PORT=8080
+CONFIG_PROXY_USERNAME=
+CONFIG_PROXY_PASSWORD=
 CONFIG_G_CHECK_URL_TIMEOUT=10
 CONFIG_G_CHECK_URL_ATTEMPTS=2
 CONFIG_CHECK_CONNECTION_IP=9.9.9.9
@@ -77,6 +82,7 @@ CONFIG_ENABLE_IPV6=1
 CONFIG_APT_RASPBIAN_MIRROR=http://raspbian.raspberrypi.org/raspbian/
 CONFIG_APT_DEBIAN_MIRROR=https://deb.debian.org/debian/
 CONFIG_NTP_MIRROR=debian.pool.ntp.org
+SOFTWARE_DISABLE_SSH_PASSWORD_LOGINS=0
 
 #-----------------------
 # software installations
@@ -85,4 +91,8 @@ CONFIG_NTP_MIRROR=debian.pool.ntp.org
 # list of software: https://github.com/MichaIng/DietPi/wiki/DietPi-Software-list
 
 # WireGuard
-AUTO_SETUP_INSTALL_SOFTWARE_ID=172
+# TODO The installation of WireGuard by DietPi is not fully automated.
+# Who knows? this might be implemented someday...But, I doubt it.
+# As an alternative, we could possibly create our own shell script to
+# automatically install this piece of software.
+#AUTO_SETUP_INSTALL_SOFTWARE_ID=172
