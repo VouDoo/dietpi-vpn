@@ -19,7 +19,13 @@
 
 6. Create the cron job that will automatically update the DuckDNS domain
 
-    Copy and run as root the [duckdns.sh](duckdns.sh) convenience script and then, edit any "changeit" values in `/opt/duckdns/config`.
+    Execute this cURL one-liner as root:
+
+    ```sh
+    curl -s https://raw.githubusercontent.com/VouDoo/dietpi-vpn/main/duckdns.sh | sudo /bin/sh
+    ```
+
+    Then, edit any "changeit" values in `/opt/duckdns/config`.
 
 7. Install and configure WireGuard
 

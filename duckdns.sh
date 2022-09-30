@@ -4,48 +4,79 @@
 #
 # Note: this script is intended to run as root.
 
-# define where DuckDNS stuff will be installed
-TARGET_DIR=/opt/duckdns
+#
+# Installation variables
+#
+
+TARGET_DIR="/opt/duckdns"
+USER="duck"
+GROUP="duckdns"
+LOG_FILE="/var/log/duckdns"
+
+#
+# Logic of the script
+#
 
 # create directory
 mkdir -p "${TARGET_DIR}"
 
+# create group and user
+addgroup --system "${GROUP}"
+adduser --system \
+	--ingroup "${GROUP}" \
+	--home "${TARGET_DIR}" \
+	--no-create-home \
+	--disabled-login \
+	"${USER}"
+
 # create configuration file
-cat >"${TARGET_DIR}/config" <<EOF
-DUCKDNS_DOMAIN=changeit
-DUCKDNS_TOKEN=changeit
-DUCKDNS_LOGFILE=/var/log/duck.log
+config_path="${TARGET_DIR}/config"
+cat >"${config_path}" <<EOF
+# DuckDNS domain to update
+DOMAIN=changeit
+# DuckDNS token for you account
+TOKEN=changeit
 EOF
-chmod 600 "${TARGET_DIR}/config"
+chown "root:${GROUP}" "${config_path}"
+chmod 640 "${config_path}"
 
 # create script
-cat >"${TARGET_DIR}/duck.sh" <<EOF
+script_path="${TARGET_DIR}/duck.sh"
+cat >"${script_path}" <<EOF
 #!/bin/sh
 #
 # Update DuckDNS domain.
 
-log_datetime() {
+now() {
 	date --rfc-3339=seconds
 }
 
 . ${TARGET_DIR}/config
-res=\$(curl -sk "https://www.duckdns.org/update?domains=\${DUCKDNS_DOMAIN}&token=\${DUCKDNS_TOKEN}&ip=")
+
+res=\$(/usr/bin/curl -sk "https://www.duckdns.org/update?domains=\${DOMAIN}&token=\${TOKEN}&ip=")
+
 case "\${res}" in
 	"OK")
-		echo "\$(log_datetime) successfully updated \${DUCKDNS_DOMAIN} domain" >>\${DUCKDNS_LOGFILE}
+		echo "\$(now) successfully updated \${DOMAIN} domain" >>${LOG_FILE}
 		;;
 	"KO")
-		echo "\$(log_datetime) failed to update \${DUCKDNS_DOMAIN} domain" >>\${DUCKDNS_LOGFILE}
+		echo "\$(now) failed to update \${DOMAIN} domain" >>${LOG_FILE}
 		;;
 	*)
-		echo "\$(log_datetime) critical failure during the update attempt of the \${DUCKDNS_DOMAIN} domain: \${res}" >>\${DUCKDNS_LOGFILE}
+		echo "\$(now) critical failure during the update attempt of the \${DOMAIN} domain: \${res}" >>${LOG_FILE}
 		;;
 esac
 EOF
-chmod 744 "${TARGET_DIR}/duck.sh"
+chown "root:${GROUP}" "${script_path}"
+chmod 750 "${script_path}"
+
+# create log file
+touch "${LOG_FILE}" && \
+	chown "root:${GROUP}" "${LOG_FILE}" && \
+	chmod 660 "${LOG_FILE}"
 
 # add cron job to run the DuckDNS script every 5 minutes
-(crontab -l 2>/dev/null; echo "*/5 * * * * ${TARGET_DIR}/duck.sh >/dev/null 2>&1") | crontab -
-
-# ensure cron systemd unit is enabled and running
-systemctl enable --now cron
+cat >/etc/cron.d/duckdns <<EOF
+SHELL=/bin/sh
+*/5 * * * * duck ${TARGET_DIR}/duck.sh >/dev/null 2>&1
+EOF
