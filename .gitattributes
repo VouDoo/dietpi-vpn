@@ -1,3 +1,3 @@
 *               text    eol=lf linguist-vendored=true
+*.sh            text    eol=lf linguist-vendored=false linguist-language=sh
 dietpi.txt      text    eol=lf linguist-vendored=false linguist-language=ini
-dietpi_*.txt    text    eol=lf linguist-vendored=false linguist-language=ini
