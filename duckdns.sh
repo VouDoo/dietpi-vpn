@@ -76,7 +76,10 @@ touch "${LOG_FILE}" && \
 	chmod 660 "${LOG_FILE}"
 
 # add cron job to run the DuckDNS script every 5 minutes
-cat >/etc/cron.d/duckdns <<EOF
+cron_path=/etc/cron.d/duckdns
+cat >"${cron_path}" <<EOF
 SHELL=/bin/sh
 */5 * * * * duck ${TARGET_DIR}/duck.sh >/dev/null 2>&1
 EOF
+chown "root:root" "${cron_path}"
+chmod 644 "${cron_path}"
