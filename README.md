@@ -15,7 +15,7 @@ This repository contains all the resources you need to deploy your own VPN solut
 
 Category|Name|Version|Website
 :--|:--|:--|:--
-Hardware|Raspberry Pi|`4 B`, `3 B+` or `3 B`|[raspberrypi.org](https://www.raspberrypi.org/)
+Hardware|Raspberry Pi|`Pi 4 Model B`<br />`Pi 3 Model B+`<br />`Pi 3 Model B`|[raspberrypi.org](https://www.raspberrypi.org/)
 Operating system|DietPi|Latest `ARMv8 64-bit`|[dietpi.com](https://dietpi.com/)
 VPN software|WireGuard|Latest from Debian repository|[wireguard.com](https://www.wireguard.com/)
 Dynamic DNS|DuckDNS|_N/A_|[duckdns.org](https://www.duckdns.org/)
