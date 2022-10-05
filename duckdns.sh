@@ -1,48 +1,50 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Create cron job to update DuckDNS domain.
 #
 # Note: this script is intended to run as root.
 
-#
-# Installation variables
-#
+set -e
 
-TARGET_DIR="/opt/duckdns"
-USER="duck"
-GROUP="duckdns"
-LOG_FILE="/var/log/duckdns"
+# set installation variables
+user="duck"
+group="duckdns"
+home="/opt/duckdns"
+config_fpath="${home}/config"
+script_fpath="${home}/duck.sh"
+log_fpath="/var/log/duckdns"
+cron_fpath="/etc/cron.d/duckdns"
 
-#
-# Logic of the script
-#
+# create home directory
+mkdir -p "${home}"
+echo "Home directory \"${home}\" has been created."
 
-# create directory
-mkdir -p "${TARGET_DIR}"
+# add group
+addgroup --system "${group}"
+echo "Group \"${group}\" has been added."
 
-# create group and user
-addgroup --system "${GROUP}"
+# add user
 adduser --system \
-	--ingroup "${GROUP}" \
-	--home "${TARGET_DIR}" \
+	--ingroup "${group}" \
+	--home "${home}" \
 	--no-create-home \
 	--disabled-login \
-	"${USER}"
+	"${user}"
+echo "User \"${user}\" has been added."
 
 # create configuration file
-config_path="${TARGET_DIR}/config"
-cat >"${config_path}" <<EOF
+cat >"${config_fpath}" <<EOF
 # DuckDNS domain to update
 DOMAIN=changeit
 # DuckDNS token for you account
 TOKEN=changeit
 EOF
-chown "root:${GROUP}" "${config_path}"
-chmod 640 "${config_path}"
+chown "root:${group}" "${config_fpath}"
+chmod 640 "${config_fpath}"
+echo "Configuration file \"${config_fpath}\" has been created."
 
-# create script
-script_path="${TARGET_DIR}/duck.sh"
-cat >"${script_path}" <<EOF
+# create script file
+cat >"${script_fpath}" <<EOF
 #!/bin/sh
 #
 # Update DuckDNS domain.
@@ -51,35 +53,40 @@ now() {
 	date --rfc-3339=seconds
 }
 
-. ${TARGET_DIR}/config
+. ${config_fpath}
 
-res=\$(/usr/bin/curl -sk "https://www.duckdns.org/update?domains=\${DOMAIN}&token=\${TOKEN}&ip=")
+response=\$(/usr/bin/curl -sk "https://www.duckdns.org/update?domains=\${DOMAIN}&token=\${TOKEN}&ip=")
 
-case "\${res}" in
+case "\${response}" in
 	"OK")
-		echo "\$(now) successfully updated \${DOMAIN} domain" >>${LOG_FILE}
+		echo "\$(now) successfully updated \${DOMAIN} domain" >>"${log_fpath}"
 		;;
 	"KO")
-		echo "\$(now) failed to update \${DOMAIN} domain" >>${LOG_FILE}
+		echo "\$(now) failed to update \${DOMAIN} domain" >>"${log_fpath}"
 		;;
 	*)
-		echo "\$(now) critical failure during the update attempt of the \${DOMAIN} domain: \${res}" >>${LOG_FILE}
+		echo "\$(now) critical failure during the update attempt of the \${DOMAIN} domain: \${response}" >>"${log_fpath}"
 		;;
 esac
 EOF
-chown "root:${GROUP}" "${script_path}"
-chmod 750 "${script_path}"
+chown "root:${group}" "${script_fpath}"
+chmod 750 "${script_fpath}"
+echo "Script file \"${script_fpath}\" has been created."
 
 # create log file
-touch "${LOG_FILE}" && \
-	chown "root:${GROUP}" "${LOG_FILE}" && \
-	chmod 660 "${LOG_FILE}"
+touch "${log_fpath}"
+chown "root:${group}" "${log_fpath}"
+chmod 660 "${log_fpath}"
+echo "Log file \"${log_fpath}\" has been created."
 
 # add cron job to run the DuckDNS script every 5 minutes
-cron_path=/etc/cron.d/duckdns
-cat >"${cron_path}" <<EOF
+cat >"${cron_fpath}" <<EOF
 SHELL=/bin/sh
-*/5 * * * * duck ${TARGET_DIR}/duck.sh >/dev/null 2>&1
+*/5 * * * * ${user} ${script_fpath} >/dev/null 2>&1
 EOF
-chown "root:root" "${cron_path}"
-chmod 644 "${cron_path}"
+chown "root:root" "${cron_fpath}"
+chmod 644 "${cron_fpath}"
+echo "Cron file \"${cron_fpath}\" has been created."
+
+# unset installation variables
+unset -v user group home config_fpath script_fpath log_fpath cron_fpath
