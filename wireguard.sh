@@ -37,9 +37,11 @@ apt-get install -yq \
 
 # install packages with APT
 apt-get install -yq \
-	wireguard-dkms \
+	wireguard \
 	wireguard-tools \
-	qrencode
+	qrencode \
+	iptables \
+	resolvconf
 echo "Packages have been installed."
 
 # set default file permissions for newly created files,
